@@ -17,4 +17,4 @@ jobs:
       - name: 의존성 설치
         run: pip install requests beautifulsoup4
       - name: 뉴스 등록 실행
-        run: python notion_news.py
+        run: python notion_upload.py
