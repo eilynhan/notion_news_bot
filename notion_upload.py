@@ -37,13 +37,13 @@ def fetch_mfds():
     print("👉 식약처 뉴스 수집 중...")
     res = requests.get("https://www.mfds.go.kr/brd/m_99/list.do")
     soup = BeautifulSoup(res.text, "html.parser")
-    rows = soup.select(".board_list tbody tr")
+    rows = soup.select("table tbody tr")
     print(f"총 {len(rows)}개 항목 발견")
     for row in rows:
         a_tag = row.select_one("td.subject a")
         if a_tag:
             title = a_tag.text.strip()
-            link = "https://www.mfds.go.kr" + a_tag["href"]
+            link = "https://www.mfds.go.kr" + a_tag.get("href")
             print(" -", title)
             if contains_keyword(title):
                 post_to_notion(title, link, "식약처")
@@ -58,10 +58,10 @@ def fetch_nedrug_html():
             return
 
         soup = BeautifulSoup(res.text, "html.parser")
-        rows = soup.select("table.list_table tbody tr")
+        rows = soup.select("table.board_list tbody tr")
         print(f"총 {len(rows)}개 항목 발견")
         for row in rows:
-            a_tag = row.select_one("td a")
+            a_tag = row.select_one("td.subject a")
             if a_tag:
                 title = a_tag.text.strip()
                 link = "https://nedrug.mfds.go.kr" + a_tag.get("href")
@@ -75,13 +75,13 @@ def fetch_kcia_news():
     print("👉 대한화장품협회 뉴스 수집 중...")
     res = requests.get("https://www.kcia.or.kr/news/notice.php")
     soup = BeautifulSoup(res.text, "html.parser")
-    rows = soup.select(".tbl_type1 tbody tr")
+    rows = soup.select("table.tbl_type1 tbody tr")
     print(f"총 {len(rows)}개 항목 발견")
     for row in rows:
         a_tag = row.select_one("td.subject a")
         if a_tag:
             title = a_tag.text.strip()
-            link = "https://www.kcia.or.kr/news/" + a_tag["href"]
+            link = "https://www.kcia.or.kr/news/" + a_tag.get("href")
             print(" -", title)
             if contains_keyword(title):
                 post_to_notion(title, link, "대한화장품협회-공지")
@@ -90,13 +90,13 @@ def fetch_kcia_laws():
     print("👉 대한화장품협회 법령 수집 중...")
     res = requests.get("https://www.kcia.or.kr/law/law_01.php")
     soup = BeautifulSoup(res.text, "html.parser")
-    rows = soup.select(".tbl_type1 tbody tr")
+    rows = soup.select("table.tbl_type1 tbody tr")
     print(f"총 {len(rows)}개 항목 발견")
     for row in rows:
         a_tag = row.select_one("td.subject a")
         if a_tag:
             title = a_tag.text.strip()
-            link = "https://www.kcia.or.kr/law/" + a_tag["href"]
+            link = "https://www.kcia.or.kr/law/" + a_tag.get("href")
             print(" -", title)
             if contains_keyword(title):
                 post_to_notion(title, link, "대한화장품협회-법령")
@@ -105,13 +105,13 @@ def fetch_korcham():
     print("👉 대한상공회의소 공지 수집 중...")
     res = requests.get("https://www.korcham.net/nCham/Service/Board/appl/notice_list.asp")
     soup = BeautifulSoup(res.text, "html.parser")
-    rows = soup.select(".tbl_list tbody tr")
+    rows = soup.select("table.tbl_list tbody tr")
     print(f"총 {len(rows)}개 항목 발견")
     for row in rows:
         a_tag = row.select_one("td.subject a")
         if a_tag:
             title = a_tag.text.strip()
-            link = "https://www.korcham.net" + a_tag["href"]
+            link = "https://www.korcham.net" + a_tag.get("href")
             print(" -", title)
             if contains_keyword(title):
                 post_to_notion(title, link, "대한상공회의소")
