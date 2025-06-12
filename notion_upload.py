@@ -24,7 +24,10 @@ def post_to_notion(title, url):
         }
     }
     response = requests.post("https://api.notion.com/v1/pages", headers=headers, json=data)
-    print("✅ 등록" if response.status_code in [200, 201] else f"❌ 실패: {response.text}")
+    if response.status_code in [200, 201]:
+        print("✅ 등록:", title)
+    else:
+        print(f"❌ 실패: {title} → {response.status_code} {response.text}")
 
 def contains_keyword(text):
     return any(keyword in text for keyword in KEYWORDS)
@@ -40,17 +43,25 @@ def fetch_mfds():
             post_to_notion(title, link)
 
 def fetch_nedrug():
-    res = requests.post(
-        "https://nedrug.mfds.go.kr/pbp/CCBBB01/getList.do",
-        data={"page": "1", "pageUnit": "10"},
-        headers={"X-Requested-With": "XMLHttpRequest"}
-    )
-    items = res.json().get("data", [])
-    for item in items:
-        title = item["bbsTitl"]
-        link = f"https://nedrug.mfds.go.kr/pbp/CCBBB01/getView.do?bbsSn={item['bbsSn']}"
-        if contains_keyword(title):
-            post_to_notion(title, link)
+    try:
+        res = requests.post(
+            "https://nedrug.mfds.go.kr/pbp/CCBBB01/getList.do",
+            data={"page": "1", "pageUnit": "10"},
+            headers={
+                "X-Requested-With": "XMLHttpRequest",
+                "User-Agent": "Mozilla/5.0 (compatible; notion-bot/1.0)"
+            },
+            timeout=10
+        )
+        data = res.json()
+        items = data.get("data", [])
+        for item in items:
+            title = item["bbsTitl"]
+            link = f"https://nedrug.mfds.go.kr/pbp/CCBBB01/getView.do?bbsSn={item['bbsSn']}"
+            if contains_keyword(title):
+                post_to_notion(title, link)
+    except Exception as e:
+        print("❌ 의약품안전나라 응답 파싱 실패:", e)
 
 def fetch_kcia():
     res = requests.get("https://www.kcia.or.kr/notice/notice_list.asp")
