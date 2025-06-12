@@ -2,12 +2,15 @@ name: Notion 뉴스봇
 
 on:
   schedule:
-    - cron: '0 0 * * *'  # 매일 오전 9시 (UTC 기준)
+    - cron: '0 0 * * *'  # 매일 오전 9시
   workflow_dispatch:
 
 jobs:
   run-news-bot:
     runs-on: ubuntu-latest
+    env:  # ← 요기 추가!
+      NOTION_API_KEY: ${{ secrets.NOTION_API_KEY }}
+      DATABASE_ID: ${{ secrets.DATABASE_ID }}
     steps:
       - uses: actions/checkout@v3
       - name: Python 설치
