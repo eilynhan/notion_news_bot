@@ -38,13 +38,13 @@ def fetch_naver_news():
     url = "https://search.naver.com/search.naver?where=news&query=%EB%A7%9E%EC%B6%A4%ED%98%95%ED%99%94%EC%9E%A5%ED%92%88"
     res = requests.get(url, headers={"User-Agent": "Mozilla/5.0"})
     soup = BeautifulSoup(res.text, "html.parser")
-    items = soup.select(".list_news div.news_area")
+    items = soup.select("ul.list_news > li.bx")
     print(f"총 {len(items)}개 항목 발견")
     for item in items:
         a_tag = item.select_one("a.news_tit")
         if a_tag:
-            title = a_tag["title"]
-            link = a_tag["href"]
+            title = a_tag.get("title") or a_tag.text.strip()
+            link = a_tag.get("href")
             print(" -", title)
             if contains_keyword(title):
                 post_to_notion(title, link, "네이버뉴스")
