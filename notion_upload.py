@@ -36,12 +36,12 @@ def contains_keyword(text):
 def fetch_mfds():
     # 각 fetch_* 함수 맨 위에 아래 코드를 추가해 주세요:
 
-print("👉 [테스트] 페이지 가져오는 중: [사이트 이름]")
-res = requests.get("해당 사이트 URL", headers={"User-Agent": "Mozilla/5.0"})
-print("상태 코드:", res.status_code)
-soup = BeautifulSoup(res.text, "html.parser")
-rows = soup.select("사용 중인 셀렉터")
-print("발견된 항목 수:", len(rows))
+    print("👉 [테스트] 페이지 가져오는 중: [사이트 이름]")
+    res = requests.get("해당 사이트 URL", headers={"User-Agent": "Mozilla/5.0"})
+    print("상태 코드:", res.status_code)
+    soup = BeautifulSoup(res.text, "html.parser")
+    rows = soup.select("사용 중인 셀렉터")
+    print("발견된 항목 수:", len(rows))
     print("👉 식약처 뉴스 수집 중...")
     res = requests.get("https://www.mfds.go.kr/brd/m_99/list.do")
     soup = BeautifulSoup(res.text, "html.parser")
