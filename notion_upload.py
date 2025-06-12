@@ -53,7 +53,17 @@ def fetch_nedrug():
             },
             timeout=10
         )
-        data = res.json()
+        if res.status_code != 200:
+            print("❌ 의약품안전나라 응답 실패:", res.status_code)
+            return
+
+        try:
+            data = res.json()
+        except Exception as json_error:
+            print("❌ JSON 파싱 오류:", json_error)
+            print("응답 내용:", res.text[:200])  # 처음 200자만 출력
+            return
+
         items = data.get("data", [])
         for item in items:
             title = item["bbsTitl"]
@@ -61,7 +71,7 @@ def fetch_nedrug():
             if contains_keyword(title):
                 post_to_notion(title, link)
     except Exception as e:
-        print("❌ 의약품안전나라 응답 파싱 실패:", e)
+        print("❌ 의약품안전나라 요청 실패:", e)
 
 def fetch_kcia():
     res = requests.get("https://www.kcia.or.kr/notice/notice_list.asp")
