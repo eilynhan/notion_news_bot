@@ -33,93 +33,21 @@ def post_to_notion(title, url, source):
 def contains_keyword(text):
     return any(keyword in text for keyword in KEYWORDS)
 
-def fetch_mfds():
-    print("👉 식약처 뉴스 수집 중...")
-    res = requests.get("https://www.mfds.go.kr/brd/m_99/list.do", headers={"User-Agent": "Mozilla/5.0"})
+def fetch_naver_news():
+    print("👉 네이버 뉴스 테스트 수집 중...")
+    url = "https://search.naver.com/search.naver?where=news&query=%EB%A7%9E%EC%B6%A4%ED%98%95%ED%99%94%EC%9E%A5%ED%92%88"
+    res = requests.get(url, headers={"User-Agent": "Mozilla/5.0"})
     soup = BeautifulSoup(res.text, "html.parser")
-    rows = soup.select("table.table tbody tr")
-    print(f"총 {len(rows)}개 항목 발견")
-    for row in rows:
-        a_tag = row.select_one("td.subject a")
+    items = soup.select(".list_news div.news_area")
+    print(f"총 {len(items)}개 항목 발견")
+    for item in items:
+        a_tag = item.select_one("a.news_tit")
         if a_tag:
-            title = a_tag.text.strip()
-            link = "https://www.mfds.go.kr" + a_tag.get("href")
+            title = a_tag["title"]
+            link = a_tag["href"]
             print(" -", title)
             if contains_keyword(title):
-                post_to_notion(title, link, "식약처")
-
-def fetch_nedrug_html():
-    print("👉 의약품안전나라 뉴스 수집 중...")
-    try:
-        url = "https://nedrug.mfds.go.kr/pbp/CCBA01/getList"
-        headers_local = {
-            "User-Agent": "Mozilla/5.0",
-            "Accept": "application/json"
-        }
-        res = requests.post(url, headers=headers_local, json={"page": 1, "perPage": 10})
-        if res.status_code != 200:
-            print("❌ 의약품안전나라 응답 실패:", res.status_code)
-            return
-        data = res.json()
-        items = data.get("list", [])
-        print(f"총 {len(items)}개 항목 발견")
-        for item in items:
-            title = item.get("title", "")
-            link = f"https://nedrug.mfds.go.kr/pbp/CCBA01/view.do?seq={item.get('seq')}"
-            print(" -", title)
-            if contains_keyword(title):
-                post_to_notion(title, link, "의약품안전나라")
-    except Exception as e:
-        print("❌ 의약품안전나라 요청 실패:", e)
-
-def fetch_kcia_news():
-    print("👉 대한화장품협회 뉴스 수집 중...")
-    res = requests.get("https://www.kcia.or.kr/news/notice.php", headers={"User-Agent": "Mozilla/5.0"})
-    soup = BeautifulSoup(res.text, "html.parser")
-    rows = soup.select("table.tbl_type1 tbody tr")
-    print(f"총 {len(rows)}개 항목 발견")
-    for row in rows:
-        a_tag = row.select_one("td a")
-        if a_tag:
-            title = a_tag.text.strip()
-            link = "https://www.kcia.or.kr/news/" + a_tag.get("href")
-            print(" -", title)
-            if contains_keyword(title):
-                post_to_notion(title, link, "대한화장품협회-공지")
-
-def fetch_kcia_laws():
-    print("👉 대한화장품협회 법령 수집 중...")
-    res = requests.get("https://www.kcia.or.kr/law/law_01.php", headers={"User-Agent": "Mozilla/5.0"})
-    soup = BeautifulSoup(res.text, "html.parser")
-    rows = soup.select("table.tbl_type1 tbody tr")
-    print(f"총 {len(rows)}개 항목 발견")
-    for row in rows:
-        a_tag = row.select_one("td a")
-        if a_tag:
-            title = a_tag.text.strip()
-            link = "https://www.kcia.or.kr/law/" + a_tag.get("href")
-            print(" -", title)
-            if contains_keyword(title):
-                post_to_notion(title, link, "대한화장품협회-법령")
-
-def fetch_korcham():
-    print("👉 대한상공회의소 공지 수집 중...")
-    res = requests.get("https://www.korcham.net/nCham/Service/Board/appl/notice_list.asp", headers={"User-Agent": "Mozilla/5.0"})
-    soup = BeautifulSoup(res.text, "html.parser")
-    rows = soup.select("table.tbl_list tbody tr")
-    print(f"총 {len(rows)}개 항목 발견")
-    for row in rows:
-        a_tag = row.select_one("td a")
-        if a_tag:
-            title = a_tag.text.strip()
-            link = "https://www.korcham.net" + a_tag.get("href")
-            print(" -", title)
-            if contains_keyword(title):
-                post_to_notion(title, link, "대한상공회의소")
+                post_to_notion(title, link, "네이버뉴스")
 
 # 실행
-fetch_mfds()
-fetch_nedrug_html()
-fetch_kcia_news()
-fetch_kcia_laws()
-fetch_korcham()
+fetch_naver_news()
