@@ -14,13 +14,14 @@ headers = {
 
 KEYWORDS = ["맞춤형화장품", "화장품", "뷰티", "맞춤형화장품조제관리사"]
 
-def post_to_notion(title, url, source):
+
+def post_to_notion(title, url, source, date):
     data = {
         "parent": {"database_id": DATABASE_ID},
         "properties": {
             "제목": {"title": [{"text": {"content": title}}]},
             "링크": {"url": url},
-            "날짜": {"date": {"start": datetime.now().isoformat()}},
+            "날짜": {"date": {"start": date}},
             "출처": {"rich_text": [{"text": {"content": source}}]}
         }
     }
@@ -30,8 +31,10 @@ def post_to_notion(title, url, source):
     else:
         print(f"❌ 실패: {title} → {response.status_code} {response.text}")
 
+
 def contains_keyword(text):
     return any(keyword in text for keyword in KEYWORDS)
+
 
 def fetch_naver_news():
     print("👉 네이버 뉴스 테스트 수집 중...")
@@ -42,12 +45,24 @@ def fetch_naver_news():
     print(f"총 {len(items)}개 항목 발견")
     for item in items:
         a_tag = item.select_one("a.news_tit")
-        if a_tag:
+        press_tag = item.select_one("a.info.press")
+        date_tag = item.select("span.info")
+
+        if a_tag and press_tag:
             title = a_tag.get("title") or a_tag.text.strip()
             link = a_tag.get("href")
+            press = press_tag.get_text(strip=True).replace("언론사 선택", "")
+            date_text = ""
+            for tag in date_tag:
+                text = tag.get_text(strip=True)
+                if '전' in text or '.' in text:
+                    date_text = text
+                    break
+            date_obj = datetime.now().isoformat()  # 날짜 파싱 안되면 현재 시간 사용
             print(" -", title)
             if contains_keyword(title):
-                post_to_notion(title, link, "네이버뉴스")
+                post_to_notion(title, link, press, date_obj)
+
 
 # 실행
 fetch_naver_news()
