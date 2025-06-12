@@ -42,34 +42,23 @@ def fetch_mfds():
         if contains_keyword(title):
             post_to_notion(title, link)
 
-def fetch_nedrug():
+def fetch_nedrug_html():
     try:
-        res = requests.post(
-            "https://nedrug.mfds.go.kr/pbp/CCBBB01/getList.do",
-            data={"page": "1", "pageUnit": "10"},
-            headers={
-                "X-Requested-With": "XMLHttpRequest",
-                "User-Agent": "Mozilla/5.0 (compatible; notion-bot/1.0)"
-            },
-            timeout=10
-        )
+        url = "https://nedrug.mfds.go.kr/bizInfoNoticeList.do"
+        res = requests.get(url, headers={"User-Agent": "Mozilla/5.0"}, timeout=10)
         if res.status_code != 200:
             print("❌ 의약품안전나라 응답 실패:", res.status_code)
             return
 
-        try:
-            data = res.json()
-        except Exception as json_error:
-            print("❌ JSON 파싱 오류:", json_error)
-            print("응답 내용:", res.text[:200])  # 처음 200자만 출력
-            return
-
-        items = data.get("data", [])
-        for item in items:
-            title = item["bbsTitl"]
-            link = f"https://nedrug.mfds.go.kr/pbp/CCBBB01/getView.do?bbsSn={item['bbsSn']}"
-            if contains_keyword(title):
-                post_to_notion(title, link)
+        soup = BeautifulSoup(res.text, "html.parser")
+        rows = soup.select("table tbody tr")
+        for row in rows:
+            title_tag = row.select_one("td.subject a")
+            if title_tag:
+                title = title_tag.text.strip()
+                link = "https://nedrug.mfds.go.kr" + title_tag.get("href")
+                if contains_keyword(title):
+                    post_to_notion(title, link)
     except Exception as e:
         print("❌ 의약품안전나라 요청 실패:", e)
 
@@ -99,6 +88,6 @@ def fetch_korcham():
 
 # 실행
 fetch_mfds()
-fetch_nedrug()
+fetch_nedrug_html()
 fetch_kcia()
 fetch_korcham()
