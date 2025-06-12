@@ -34,16 +34,8 @@ def contains_keyword(text):
     return any(keyword in text for keyword in KEYWORDS)
 
 def fetch_mfds():
-    # 각 fetch_* 함수 맨 위에 아래 코드를 추가해 주세요:
-
-    print("👉 [테스트] 페이지 가져오는 중: [사이트 이름]")
-    res = requests.get("해당 사이트 URL", headers={"User-Agent": "Mozilla/5.0"})
-    print("상태 코드:", res.status_code)
-    soup = BeautifulSoup(res.text, "html.parser")
-    rows = soup.select("사용 중인 셀렉터")
-    print("발견된 항목 수:", len(rows))
     print("👉 식약처 뉴스 수집 중...")
-    res = requests.get("https://www.mfds.go.kr/brd/m_99/list.do")
+    res = requests.get("https://www.mfds.go.kr/brd/m_99/list.do", headers={"User-Agent": "Mozilla/5.0"})
     soup = BeautifulSoup(res.text, "html.parser")
     rows = soup.select("table.table tbody tr")
     print(f"총 {len(rows)}개 항목 발견")
@@ -57,13 +49,6 @@ def fetch_mfds():
                 post_to_notion(title, link, "식약처")
 
 def fetch_nedrug_html():
-    # 각 fetch_* 함수 맨 위에 아래 코드를 추가해 주세요:
-    print("👉 [테스트] 페이지 가져오는 중: [사이트 이름]")
-    res = requests.get("해당 사이트 URL", headers={"User-Agent": "Mozilla/5.0"})
-    print("상태 코드:", res.status_code)
-    soup = BeautifulSoup(res.text, "html.parser")
-    rows = soup.select("사용 중인 셀렉터")
-    print("발견된 항목 수:", len(rows))
     print("👉 의약품안전나라 뉴스 수집 중...")
     try:
         url = "https://nedrug.mfds.go.kr/pbp/CCBA01/getList"
@@ -88,16 +73,8 @@ def fetch_nedrug_html():
         print("❌ 의약품안전나라 요청 실패:", e)
 
 def fetch_kcia_news():
-    # 각 fetch_* 함수 맨 위에 아래 코드를 추가해 주세요:
-
-    print("👉 [테스트] 페이지 가져오는 중: [사이트 이름]")
-    res = requests.get("해당 사이트 URL", headers={"User-Agent": "Mozilla/5.0"})
-    print("상태 코드:", res.status_code)
-    soup = BeautifulSoup(res.text, "html.parser")
-    rows = soup.select("사용 중인 셀렉터")
-    print("발견된 항목 수:", len(rows))
     print("👉 대한화장품협회 뉴스 수집 중...")
-    res = requests.get("https://www.kcia.or.kr/news/notice.php")
+    res = requests.get("https://www.kcia.or.kr/news/notice.php", headers={"User-Agent": "Mozilla/5.0"})
     soup = BeautifulSoup(res.text, "html.parser")
     rows = soup.select("table.tbl_type1 tbody tr")
     print(f"총 {len(rows)}개 항목 발견")
@@ -111,16 +88,8 @@ def fetch_kcia_news():
                 post_to_notion(title, link, "대한화장품협회-공지")
 
 def fetch_kcia_laws():
-    # 각 fetch_* 함수 맨 위에 아래 코드를 추가해 주세요:
-
-    print("👉 [테스트] 페이지 가져오는 중: [사이트 이름]")
-    res = requests.get("해당 사이트 URL", headers={"User-Agent": "Mozilla/5.0"})
-    print("상태 코드:", res.status_code)
-    soup = BeautifulSoup(res.text, "html.parser")
-    rows = soup.select("사용 중인 셀렉터")
-    print("발견된 항목 수:", len(rows))
     print("👉 대한화장품협회 법령 수집 중...")
-    res = requests.get("https://www.kcia.or.kr/law/law_01.php")
+    res = requests.get("https://www.kcia.or.kr/law/law_01.php", headers={"User-Agent": "Mozilla/5.0"})
     soup = BeautifulSoup(res.text, "html.parser")
     rows = soup.select("table.tbl_type1 tbody tr")
     print(f"총 {len(rows)}개 항목 발견")
@@ -134,16 +103,8 @@ def fetch_kcia_laws():
                 post_to_notion(title, link, "대한화장품협회-법령")
 
 def fetch_korcham():
-        # 각 fetch_* 함수 맨 위에 아래 코드를 추가해 주세요:
-    
-    print("👉 [테스트] 페이지 가져오는 중: [사이트 이름]")
-    res = requests.get("해당 사이트 URL", headers={"User-Agent": "Mozilla/5.0"})
-    print("상태 코드:", res.status_code)
-    soup = BeautifulSoup(res.text, "html.parser")
-    rows = soup.select("사용 중인 셀렉터")
-    print("발견된 항목 수:", len(rows))
     print("👉 대한상공회의소 공지 수집 중...")
-    res = requests.get("https://www.korcham.net/nCham/Service/Board/appl/notice_list.asp")
+    res = requests.get("https://www.korcham.net/nCham/Service/Board/appl/notice_list.asp", headers={"User-Agent": "Mozilla/5.0"})
     soup = BeautifulSoup(res.text, "html.parser")
     rows = soup.select("table.tbl_list tbody tr")
     print(f"총 {len(rows)}개 항목 발견")
