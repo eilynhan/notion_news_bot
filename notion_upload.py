@@ -51,23 +51,24 @@ def fetch_mfds():
 def fetch_nedrug_html():
     print("👉 의약품안전나라 뉴스 수집 중...")
     try:
-        url = "https://nedrug.mfds.go.kr/pbp/CCBA01/getList"  # 새 API 기반 URL 필요 시 대체
-        res = requests.get(url, headers={"User-Agent": "Mozilla/5.0"}, timeout=10)
+        url = "https://nedrug.mfds.go.kr/pbp/CCBA01/getList"
+        headers_local = {
+            "User-Agent": "Mozilla/5.0",
+            "Accept": "application/json"
+        }
+        res = requests.post(url, headers=headers_local, json={"page": 1, "perPage": 10})
         if res.status_code != 200:
             print("❌ 의약품안전나라 응답 실패:", res.status_code)
             return
-
-        soup = BeautifulSoup(res.text, "html.parser")
-        rows = soup.select("table.tblType01 tbody tr")
-        print(f"총 {len(rows)}개 항목 발견")
-        for row in rows:
-            a_tag = row.select_one("td a")
-            if a_tag:
-                title = a_tag.text.strip()
-                link = "https://nedrug.mfds.go.kr" + a_tag.get("href")
-                print(" -", title)
-                if contains_keyword(title):
-                    post_to_notion(title, link, "의약품안전나라")
+        data = res.json()
+        items = data.get("list", [])
+        print(f"총 {len(items)}개 항목 발견")
+        for item in items:
+            title = item.get("title", "")
+            link = f"https://nedrug.mfds.go.kr/pbp/CCBA01/view.do?seq={item.get('seq')}"
+            print(" -", title)
+            if contains_keyword(title):
+                post_to_notion(title, link, "의약품안전나라")
     except Exception as e:
         print("❌ 의약품안전나라 요청 실패:", e)
 
