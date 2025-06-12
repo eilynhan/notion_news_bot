@@ -37,7 +37,7 @@ def fetch_mfds():
     print("👉 식약처 뉴스 수집 중...")
     res = requests.get("https://www.mfds.go.kr/brd/m_99/list.do")
     soup = BeautifulSoup(res.text, "html.parser")
-    rows = soup.select("table tbody tr")
+    rows = soup.select("table.table tbody tr")
     print(f"총 {len(rows)}개 항목 발견")
     for row in rows:
         a_tag = row.select_one("td.subject a")
@@ -51,17 +51,17 @@ def fetch_mfds():
 def fetch_nedrug_html():
     print("👉 의약품안전나라 뉴스 수집 중...")
     try:
-        url = "https://nedrug.mfds.go.kr/pbp/CCBBB01/list.do"
+        url = "https://nedrug.mfds.go.kr/pbp/CCBA01/getList"  # 새 API 기반 URL 필요 시 대체
         res = requests.get(url, headers={"User-Agent": "Mozilla/5.0"}, timeout=10)
         if res.status_code != 200:
             print("❌ 의약품안전나라 응답 실패:", res.status_code)
             return
 
         soup = BeautifulSoup(res.text, "html.parser")
-        rows = soup.select("table.board_list tbody tr")
+        rows = soup.select("table.tblType01 tbody tr")
         print(f"총 {len(rows)}개 항목 발견")
         for row in rows:
-            a_tag = row.select_one("td.subject a")
+            a_tag = row.select_one("td a")
             if a_tag:
                 title = a_tag.text.strip()
                 link = "https://nedrug.mfds.go.kr" + a_tag.get("href")
@@ -78,7 +78,7 @@ def fetch_kcia_news():
     rows = soup.select("table.tbl_type1 tbody tr")
     print(f"총 {len(rows)}개 항목 발견")
     for row in rows:
-        a_tag = row.select_one("td.subject a")
+        a_tag = row.select_one("td a")
         if a_tag:
             title = a_tag.text.strip()
             link = "https://www.kcia.or.kr/news/" + a_tag.get("href")
@@ -93,7 +93,7 @@ def fetch_kcia_laws():
     rows = soup.select("table.tbl_type1 tbody tr")
     print(f"총 {len(rows)}개 항목 발견")
     for row in rows:
-        a_tag = row.select_one("td.subject a")
+        a_tag = row.select_one("td a")
         if a_tag:
             title = a_tag.text.strip()
             link = "https://www.kcia.or.kr/law/" + a_tag.get("href")
@@ -108,7 +108,7 @@ def fetch_korcham():
     rows = soup.select("table.tbl_list tbody tr")
     print(f"총 {len(rows)}개 항목 발견")
     for row in rows:
-        a_tag = row.select_one("td.subject a")
+        a_tag = row.select_one("td a")
         if a_tag:
             title = a_tag.text.strip()
             link = "https://www.korcham.net" + a_tag.get("href")
